@@ -1,9 +1,14 @@
 
 interface CollectorOptions {
   /**
-   * default ['navigation', 'resource', 'measure', 'paint']
+   * default ['navigation', 'resource', 'mark', 'measure', 'paint']
    */
   entryTypes?: string[];
+  /**
+   * This will be called when performance.getEntries() changed.
+   * Even PerformanceObserver is not supported, callback will be triggered with initial entries.
+   * If you don't want to receive any entries in that situation, set ignoreInitialEntries to false.
+   */
   callback?(entries: PerformanceEntry[]): void;
   /**
    * callback will not triggered at start of throttle, so you should not set a large number.
@@ -21,6 +26,10 @@ interface CollectorOptions {
    * Remember send request in callback will also trigger callback. You should check name of entry to skip metric collect request.
    */
   filter?(entry: PerformanceEntry): void;
+  /**
+   * If PerformanceObserver is not supported & there is no polyfill, this will be called.
+   */
+  onUnsupported?(): void;
 }
 
 function defaultFilter(entry: PerformanceEntry & { initiatorType?: string }) {
@@ -28,7 +37,7 @@ function defaultFilter(entry: PerformanceEntry & { initiatorType?: string }) {
 }
 
 export function initCollector(option: CollectorOptions = {}) {
-  const { entryTypes = ['navigation', 'resource', 'measure', 'paint'], ignoreInitialEntries, filter = defaultFilter } = option;
+  const { entryTypes = ['navigation', 'resource', 'mark', 'measure', 'paint'], ignoreInitialEntries, filter = defaultFilter, onUnsupported } = option;
 
   let observer: PerformanceObserver;
   let entrisBuffer: PerformanceEntry[] = [];
@@ -62,6 +71,11 @@ export function initCollector(option: CollectorOptions = {}) {
       entrisBuffer = performance.getEntries().filter((e) => e.entryType !== 'navigation' && entryTypes.indexOf(e.entryType) > -1);
       tryTriggerCallback();
     }
+    if (typeof PerformanceObserver !== 'function') {
+      onUnsupported && onUnsupported();
+      return;
+    }
+
     observer = new PerformanceObserver(perfObserver);
     observer.observe({ entryTypes })
     function perfObserver(entries: PerformanceObserverEntryList, observer: PerformanceObserver) {
