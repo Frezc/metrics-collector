@@ -4,3 +4,6 @@ dist/
 .cache/
 server/target/
 .idea/
+lib/
+es/
+types/

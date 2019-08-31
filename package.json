@@ -1,19 +1,41 @@
 {
-  "name": "metrics-collector",
+  "name": "performance-collector",
   "version": "0.1.0",
-  "description": "frontend metrics collector",
+  "description": "frontend performance collector",
   "main": "lib/index.js",
+  "browser": "es/index.js",
+  "types": "types/index.d.ts",
+  "files": [
+    "es",
+    "lib",
+    "src",
+    "types"
+  ],
   "scripts": {
     "start": "parcel example/index.html",
-    "build": "parcel build example/index.html"
+    "pkg": "parcel example/index.ts",
+    "build": "npm run build:types && npm run build:cjs && npm run build:es",
+    "build:cjs": "rimraf ./lib && cross-env MODULES=cjs babel src --out-dir lib --extensions .ts",
+    "build:es": "rimraf ./es && babel src --out-dir es --extensions .ts",
+    "build:types": "rimraf ./types && tsc --emitDeclarationOnly",
+    "prepublishOnly": "yarn build"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["performance", "monitor"],
+  "author": "frezc (frezcw@gmail.com)",
   "license": "ISC",
   "devDependencies": {
-    "typescript": "^3.5.3"
+    "parcel-bundler": "^1.12.3",
+    "typescript": "^3.5.3",
+    "promjs": "^0.4.0",
+    "promjs-export": "^0.1.1",
+    "rimraf": "^3.0.0",
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.3.3",
+    "@babel/plugin-transform-runtime": "^7.3.4",
+    "@babel/preset-env": "^7.3.1",
+    "@babel/preset-typescript": "^7.3.3",
+    "cross-env": "^5.2.0"
   },
   "dependencies": {
-    "parcel-bundler": "^1.12.3"
   }
 }
