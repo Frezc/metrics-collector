@@ -1,7 +1,7 @@
 {
-  "name": "performance-collector",
+  "name": "performance-resource-collector",
   "version": "0.1.0",
-  "description": "frontend performance collector",
+  "description": "frontend performance resource collector",
   "main": "lib/index.js",
   "browser": "es/index.js",
   "types": "types/index.d.ts",
